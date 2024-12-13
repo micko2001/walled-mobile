@@ -1,5 +1,3 @@
-import { StatusBar } from "expo-status-bar";
-
 import {
   StyleSheet,
   Text,
@@ -8,17 +6,24 @@ import {
   TouchableOpacity,
   Image,
 } from "react-native";
-import HelloWorld from "./components/helloworld";
-import Button from "./components/Button";
-import Input from "./components/Input";
+import { StatusBar } from "expo-status-bar";
+import Button from "../components/Button";
+import TextLink from "../components/TextLink";
 
-export default function App() {
+function Register() {
   return (
     <View style={styles.container}>
       <Image
-        source={require("./assets/walled.png")}
+        source={require("../assets/walled.png")}
         style={styles.logo}
         resizeMode="stretch"
+      />
+
+      <TextInput
+        style={styles.input}
+        placeholder="Fullname"
+        placeholderTextColor="#aaa"
+        keyboardType="default"
       />
 
       <TextInput
@@ -27,22 +32,23 @@ export default function App() {
         placeholderTextColor="#aaa"
         keyboardType="email-address"
       />
-
       <TextInput
         style={styles.input}
         placeholder="Password"
         placeholderTextColor="#aaa"
         secureTextEntry={true}
       />
+      <TextInput
+        style={styles.input}
+        placeholder="Avatar url"
+        placeholderTextColor="#aaa"
+        keyboardType="url"
+      />
 
-      {/* <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Login</Text>
-      </TouchableOpacity> */}
-      <Input text="Notes" />
+      <Button text="Register" link="/" />
 
-      <Button text="Login" />
+      <TextLink text="Login here" desc="Have account?" link="/" />
       <StatusBar style="auto" hidden={true} />
-      <HelloWorld />
     </View>
   );
 }
@@ -90,3 +96,4 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 });
+export default Register;

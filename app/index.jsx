@@ -8,15 +8,16 @@ import {
   TouchableOpacity,
   Image,
 } from "react-native";
-import HelloWorld from "./components/helloworld";
-import Button from "./components/Button";
-import Input from "./components/Input";
+import { Link } from "expo-router";
+import HelloWorld from "../components/helloworld";
+import Button from "../components/Button";
+import TextLink from "../components/TextLink";
 
 export default function App() {
   return (
     <View style={styles.container}>
       <Image
-        source={require("./assets/walled.png")}
+        source={require("../assets/walled.png")}
         style={styles.logo}
         resizeMode="stretch"
       />
@@ -35,14 +36,14 @@ export default function App() {
         secureTextEntry={true}
       />
 
-      {/* <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Login</Text>
-      </TouchableOpacity> */}
-      <Input text="Notes" />
+      <Button text="Login" link="(home)" />
 
-      <Button text="Login" />
+      <TextLink
+        text="Register here"
+        desc="Don't have account?"
+        link="/register"
+      />
       <StatusBar style="auto" hidden={true} />
-      <HelloWorld />
     </View>
   );
 }
