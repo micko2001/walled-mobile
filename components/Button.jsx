@@ -1,31 +1,18 @@
 import { TouchableOpacity, Text, StyleSheet } from "react-native";
-import { Link } from "expo-router";
-import { useRouter } from "expo-router";
 
-function Button({ bgColor = "#19918F", text, link }) {
-  const router = useRouter();
-
-  const handlePress = () => {
-    if (link) {
-      router.push(link);
-    }
-  };
-
+function Button({ bgColor = "#19918F", text, handlePress = () => {} }) {
   return (
-    <Link href={link}>
-      <TouchableOpacity
-        style={{ ...styles.button, backgroundColor: bgColor }}
-        onPress={handlePress}
-      >
-        <Text style={styles.buttonText}>{text}</Text>
-      </TouchableOpacity>
-    </Link>
+    <TouchableOpacity
+      onPress={handlePress}
+      style={{ ...styles.button, backgroundColor: bgColor }}
+    >
+      <Text style={styles.buttonText}>{text}</Text>
+    </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
   button: {
-    // backgroundColor: "#19918F",
     paddingVertical: 15,
     paddingHorizontal: 30,
     borderRadius: 5,
@@ -39,4 +26,4 @@ const styles = StyleSheet.create({
   },
 });
 
-module.exports = Button;
+export default Button;

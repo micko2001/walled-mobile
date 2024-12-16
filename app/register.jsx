@@ -5,14 +5,50 @@ import {
   TextInput,
   TouchableOpacity,
   Image,
+  Modal,
+  alert,
+  Pressable,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import Button from "../components/Button";
 import TextLink from "../components/TextLink";
+import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
+import React, { useState, useEffect } from "react";
+import Checkbox from "expo-checkbox";
+import { Link } from "expo-router";
 
 function Register() {
+  const [modalVisible, setModalVisible] = useState(false);
+  const [isChecked, setChecked] = useState(false);
+  const [isRead, setIsRead] = useState(false);
+
   return (
     <View style={styles.container}>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          Alert.alert("Modal has been closed.");
+          setModalVisible(!modalVisible);
+        }}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalText}>loremjhh danandnandan dandandn</Text>
+
+            <Pressable
+              style={[styles.button, styles.buttonClose]}
+              onPress={() => {
+                setModalVisible(false);
+                setIsRead(true);
+              }}
+            >
+              <Text style={styles.textStyle}>Hide Modal</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
       <Image
         source={require("../assets/walled.png")}
         style={styles.logo}
@@ -44,6 +80,24 @@ function Register() {
         placeholderTextColor="#aaa"
         keyboardType="url"
       />
+
+      <Text>{"\n"}</Text>
+      <View style={styles.section}>
+        <Checkbox
+          style={styles.checkbox}
+          value={isChecked}
+          onValueChange={setChecked}
+        />
+        <Text style={styles.paragraph}>I have read and agree to the </Text>
+        <Link href="/tnc">
+          <Text style={styles.tnclink}>Terms and Condition</Text>
+        </Link>
+        {/* <Pressable onPress={() => setModalVisible(true)}>
+          
+        </Pressable> */}
+      </View>
+
+      <Text>{"\n"}</Text>
 
       <Button text="Register" link="/" />
 
@@ -82,6 +136,16 @@ const styles = StyleSheet.create({
     backgroundColor: "#f9f9f9",
     fontSize: 16,
   },
+  section: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  paragraph: {
+    fontSize: 15,
+  },
+  checkbox: {
+    margin: 8,
+  },
   button: {
     backgroundColor: "#4DB6AC",
     paddingVertical: 15,
@@ -89,6 +153,9 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     width: "100%",
     alignItems: "center",
+  },
+  tnclink: {
+    color: "blue",
   },
   buttonText: {
     color: "#fff",

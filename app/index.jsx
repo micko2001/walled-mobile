@@ -12,8 +12,36 @@ import { Link } from "expo-router";
 import HelloWorld from "../components/helloworld";
 import Button from "../components/Button";
 import TextLink from "../components/TextLink";
+import { z } from "zod";
+import { useState } from "react";
+
+const LoginSchema = z.object({
+  email: z.string().email({ message: "Invalid email address" }),
+  password: z.string().min(8, { message: "Must be 8 or more characters long" }),
+});
 
 export default function App() {
+  const [form, setForm] = useState({});
+  const [errorMsg, setErrors] = useState({});
+
+  handleInputChange = (key, value) => {
+    setErrors({ ...errorMsg, [key]: "" });
+    setForm({ ...form, [key]: value });
+  };
+
+  handleSubmit = () => {
+    try {
+      LoginSchema.parse(form);
+    } catch (err) {
+      const validation = err.errors;
+      const errors = {};
+      validation.map((item) => {
+        const key = item.path[0];
+        errors[key] = item.message;
+      });
+      setErrors(errors);
+    }
+  };
   return (
     <View style={styles.container}>
       <Image
@@ -27,16 +55,25 @@ export default function App() {
         placeholder="Email"
         placeholderTextColor="#aaa"
         keyboardType="email-address"
+        onChangeText={(text) => handleInputChange("email", text)}
       />
+      {errorMsg.email ? (
+        <Text style={styles.errorMsg}>{errorMsg.email}</Text>
+      ) : null}
 
       <TextInput
         style={styles.input}
         placeholder="Password"
         placeholderTextColor="#aaa"
         secureTextEntry={true}
+        onChangeText={(text) => handleInputChange("password", text)}
       />
+      {errorMsg && <Text style={styles.errorMsg}>{errorMsg.password}</Text>}
+      <Link href="/(home)" style={styles.linkText}>
+        Masuk
+      </Link>
 
-      <Button text="Login" link="(home)" />
+      <Button handlePress={handleSubmit} text="Login" />
 
       <TextLink
         text="Register here"
@@ -89,5 +126,13 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
+  },
+  errorMsg: {
+    color: "red",
+    fontSize: 12,
+    width: "100%",
+    textAlign: "left",
+    marginTop: 5,
+    marginBottom: 10,
   },
 });
