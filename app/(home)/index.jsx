@@ -9,17 +9,27 @@ import {
 } from "react-native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-
-function LogoTitle() {
-  return (
-    <Image
-      style={styles.image}
-      source={{ uri: "https://reactnative.dev/img/tiny_logo.png" }}
-    />
-  );
-}
+import { useEffect, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Home() {
+  const [storedValue, setStoredValue] = useState(null);
+
+  useEffect(() => {
+    const getProfile = async () => {
+      try {
+        const profile = await AsyncStorage.getItem("profile");
+        if (profile !== null) {
+          // Value found in storage
+          setStoredValue(JSON.parse(profile));
+          console.log(JSON.parse(profile));
+        }
+      } catch (e) {
+        console.error(e.message);
+      }
+    };
+    getProfile();
+  }, []);
   return (
     <ScrollView containerStyle={styles.container}>
       <View style={styles.header}>
@@ -30,7 +40,7 @@ export default function Home() {
           />
           <View>
             <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-              {user.fullname}
+              {storedValue ? storedValue.name : "Loading..."}
             </Text>
             <Text style={{ fontSize: 18 }}>{user.typeofaccount}</Text>
           </View>
@@ -48,7 +58,7 @@ export default function Home() {
         >
           <View style={{ width: "70%" }}>
             <Text style={{ fontSize: 22, fontWeight: "bold", marginBottom: 8 }}>
-              Good Morning, {user.fullname.split(" ")[0]}
+              Good Morning, {storedValue ? storedValue.name : "Loading..."}
             </Text>
             <Text style={{ fontSize: 18 }}>
               Check all your incoming and outgoing transactions here
@@ -63,7 +73,7 @@ export default function Home() {
         <View style={styles.accountnumber}>
           <Text style={{ color: "#fff", fontSize: 18 }}>Account No.</Text>
           <Text style={{ fontWeight: "bold", color: "#fff", fontSize: 18 }}>
-            {user.accountnumber}
+            {storedValue ? storedValue.id : "Loading..."}
           </Text>
         </View>
 
@@ -71,7 +81,7 @@ export default function Home() {
           <View>
             <Text style={{ fontSize: 20 }}>Balance</Text>
             <Text style={{ fontSize: 24, fontWeight: "bold" }}>
-              Rp {user.balance}
+              Rp {storedValue ? storedValue.balance : "Loading..."}
             </Text>
           </View>
           <View>
