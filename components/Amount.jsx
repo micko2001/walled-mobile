@@ -1,26 +1,11 @@
 import { View, StyleSheet, TextInput, Text } from "react-native";
 
-const styles = StyleSheet.create({
-  container: {
-    padding: 10,
-    width: "100%",
-    backgroundColor: "white",
-  },
-  input: {
-    fontSize: 40,
-  },
-  money: {
-    flexDirection: "row",
-    borderBottomColor: "#b3b3b3",
-    borderBottomWidth: 0.5,
-  },
-  idr: { fontSize: 16, marginRight: 12, marginTop: 12 },
-});
 export default function Amount({
   balance = 0,
   showBalance = false,
   marginTop = 0,
   marginBottom = 0,
+  changeText = () => {},
 }) {
   return (
     <View
@@ -37,6 +22,7 @@ export default function Amount({
           style={styles.input}
           placeholder="100.000"
           keyboardType="number-pad"
+          onChangeText={changeText}
         />
       </View>
       {showBalance && (
@@ -54,3 +40,19 @@ export default function Amount({
     </View>
   );
 }
+const styles = StyleSheet.create({
+  container: {
+    padding: 10,
+    width: "100%",
+    backgroundColor: "white",
+  },
+  input: {
+    fontSize: 40,
+  },
+  money: {
+    flexDirection: "row",
+    borderBottomColor: "#b3b3b3",
+    borderBottomWidth: 0.5,
+  },
+  idr: { fontSize: 16, marginRight: 12, marginTop: 12 },
+});

@@ -50,7 +50,7 @@ export default function App() {
 
   const auth = async (token) => {
     try {
-      const res = await axios.get("http://192.168.148.146:8080/profile", {
+      const res = await axios.get("https://walled-api.vercel.app/profile", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -70,7 +70,7 @@ export default function App() {
       const data = LoginSchema.parse(form);
 
       const res = await axios.post(
-        "http://192.168.148.146:8080/auth/login",
+        "https://walled-api.vercel.app/auth/login",
         data
       );
 

@@ -11,18 +11,57 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { router } from "expo-router";
+import axios from "axios";
+import { parseISO, format } from "date-fns";
+
+const convertDate = (transaction_date) => {
+  return format(parseISO(transaction_date), "dd MMMM yyyy, HH:mm:ss");
+};
+
+const imageUri = (value) => {
+  if (value !== null) {
+    return value;
+  } else {
+    return "https://www.pngall.com/wp-content/uploads/5/Profile-PNG-Image.png";
+  }
+};
 
 export default function Home() {
   const [storedValue, setStoredValue] = useState(null);
+  const [transactions, setTransactions] = useState(null);
+
+  const getTransaction = async (token) => {
+    try {
+      const res = await axios.get(
+        "https://walled-api.vercel.app/transactions",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const { data: response } = res;
+
+      setTransactions(response.data);
+    } catch (err) {
+      console.error(err.message);
+    }
+  };
 
   useEffect(() => {
     const getProfile = async () => {
       try {
         const profile = await AsyncStorage.getItem("profile");
+        const token = await AsyncStorage.getItem("token");
         if (profile !== null) {
           // Value found in storage
-          setStoredValue(JSON.parse(profile));
-          console.log(JSON.parse(profile));
+          setStoredValue(JSON.parse(profile) || null);
+        }
+        if (token !== null) {
+          console.log(token);
+          getTransaction(token);
         }
       } catch (e) {
         console.error(e.message);
@@ -35,12 +74,14 @@ export default function Home() {
       <View style={styles.header}>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
           <Image
-            source={require("../../assets/avatar.png")}
+            source={{
+              uri: imageUri(storedValue?.avatar_url),
+            }}
             style={{ width: 50, height: 50 }}
           />
           <View>
             <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-              {storedValue ? storedValue.name : "Loading..."}
+              {storedValue ? storedValue.fullname : "Loading..."}
             </Text>
             <Text style={{ fontSize: 18 }}>{user.typeofaccount}</Text>
           </View>
@@ -58,7 +99,7 @@ export default function Home() {
         >
           <View style={{ width: "70%" }}>
             <Text style={{ fontSize: 22, fontWeight: "bold", marginBottom: 8 }}>
-              Good Morning, {storedValue ? storedValue.name : "Loading..."}
+              Good Morning, {storedValue ? storedValue.fullname : "Loading..."}
             </Text>
             <Text style={{ fontSize: 18 }}>
               Check all your incoming and outgoing transactions here
@@ -73,7 +114,7 @@ export default function Home() {
         <View style={styles.accountnumber}>
           <Text style={{ color: "#fff", fontSize: 18 }}>Account No.</Text>
           <Text style={{ fontWeight: "bold", color: "#fff", fontSize: 18 }}>
-            {storedValue ? storedValue.id : "Loading..."}
+            {storedValue ? storedValue.wallet.account_number : "Loading..."}
           </Text>
         </View>
 
@@ -81,12 +122,15 @@ export default function Home() {
           <View>
             <Text style={{ fontSize: 20 }}>Balance</Text>
             <Text style={{ fontSize: 24, fontWeight: "bold" }}>
-              Rp {storedValue ? storedValue.balance : "Loading..."}
+              Rp {storedValue ? storedValue.wallet.balance : "Loading..."}
             </Text>
           </View>
           <View>
             <View style={{ gap: 20 }}>
               <TouchableOpacity
+                onPress={() => {
+                  router.replace("/topup");
+                }}
                 style={{
                   width: 40,
                   height: 40,
@@ -98,7 +142,11 @@ export default function Home() {
               >
                 <FontAwesome6 size={18} name="add" color={"#fff"} />
               </TouchableOpacity>
+
               <TouchableOpacity
+                onPress={() => {
+                  router.replace("/transfer");
+                }}
                 style={{
                   width: 40,
                   height: 40,
@@ -133,9 +181,9 @@ export default function Home() {
           >
             Transaction History
           </Text>
-          {transactions.map((transaction) => (
+          {transactions?.map((transaction) => (
             <View
-              key={transaction.id}
+              key={transaction.transaction_id}
               style={{
                 flexDirection: "row",
                 alignItems: "center",
@@ -145,19 +193,23 @@ export default function Home() {
               }}
             >
               <View>
-                <Text style={{ fontSize: 18 }}>{transaction.name}</Text>
-                <Text style={{ fontSize: 16 }}>{transaction.type}</Text>
+                <Text style={{ fontSize: 18 }}>{transaction.description}</Text>
+                <Text style={{ fontSize: 16 }}>
+                  {transaction.transaction_type}
+                </Text>
                 <Text style={{ fontSize: 14, color: "#b3b3b3" }}>
-                  {transaction.date}
+                  {convertDate(transaction.transaction_date)}
                 </Text>
               </View>
               <Text
                 style={{
                   fontSize: 18,
-                  color: transaction.debit ? "red" : "green",
+                  color:
+                    transaction.recipient_wallet_id !== null ? "red" : "green",
                 }}
               >
-                {transaction.debit ? "-" : "+"} Rp {transaction.amount}
+                {transaction.recipient_wallet_id !== null ? "-" : "+"} Rp{" "}
+                {transaction.amount}
               </Text>
             </View>
           ))}
@@ -174,32 +226,32 @@ const user = {
   balance: "10.000.000",
 };
 
-const transactions = [
-  {
-    id: 1,
-    date: "08 December 2024",
-    amount: "75.000",
-    name: "Indoapril",
-    type: "Topup",
-    debit: false,
-  },
-  {
-    id: 2,
-    date: "06 December 2024",
-    amount: "80.000",
-    name: "Si Fulan",
-    type: "Transfer",
-    debit: true,
-  },
-  {
-    id: 3,
-    date: "12 December 2024",
-    amount: "100.000",
-    name: "E-Money",
-    type: "KREDIT",
-    debit: false,
-  },
-];
+// const transactions = [
+//   {
+//     id: 1,
+//     date: "08 December 2024",
+//     amount: "75.000",
+//     name: "Indoapril",
+//     type: "Topup",
+//     debit: false,
+//   },
+//   {
+//     id: 2,
+//     date: "06 December 2024",
+//     amount: "80.000",
+//     name: "Si Fulan",
+//     type: "Transfer",
+//     debit: true,
+//   },
+//   {
+//     id: 3,
+//     date: "12 December 2024",
+//     amount: "100.000",
+//     name: "E-Money",
+//     type: "KREDIT",
+//     debit: false,
+//   },
+// ];
 
 const styles = StyleSheet.create({
   balancebox: {

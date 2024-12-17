@@ -92,9 +92,6 @@ function Register() {
         <Link href="/tnc">
           <Text style={styles.tnclink}>Terms and Condition</Text>
         </Link>
-        {/* <Pressable onPress={() => setModalVisible(true)}>
-          
-        </Pressable> */}
       </View>
 
       <Text>{"\n"}</Text>
